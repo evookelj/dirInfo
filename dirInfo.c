@@ -5,7 +5,8 @@
 #include <sys/stat.h>
 #include <string.h>
 
-int sumPrintDirFiles(DIR* dir, char* path, int sub) {
+int sumPrintDirFiles(char* path, int sub) {
+  DIR* dir;
   int sum = 0;
   struct dirent* dp;
   if ((dir=opendir(path))==NULL) { return -1; }
@@ -23,35 +24,42 @@ int sumPrintDirFiles(DIR* dir, char* path, int sub) {
     }
   }
   return sum;
+  closedir(dir);
 }
 
-int printDirRec(DIR* dir, int sub) {
-  if ((dir=opendir("."))==NULL) { return -1; }
+int printDirRec(char* path, int sub) {
+  DIR* dir;
+  if ((dir=opendir(path))==NULL) { return -1; }
   struct dirent* dp;
-  int i, sum;
+  int i;
+  int sum = 0;
   for (i=0; i<sub; i++) { printf("\t"); }
   printf("DIRECTORIES: \n");
   while ((dp=readdir(dir))!=NULL) {
     if (dp->d_type == DT_DIR) {
       for (i=0; i<sub; i++) { printf("\t"); }
       printf("\t%s\n", dp->d_name);
-      sum = sumPrintDirFiles(opendir("."), ".", sub+1);
+      sum += sumPrintDirFiles(dp->d_name, sub+1);
     }
   }
+  closedir(dir);
+  return sum;
+}
+
+int printDir(char* path) {
+  DIR* dir;
+  int sum = 0;
+  if ((dir=opendir("."))==NULL) { return -1; }
+  else {
+    sum += printDirRec(path, 0);
+    sum += sumPrintDirFiles(path, 0);
+  }
+  closedir(dir);
   return sum;
 }
 
 int main() {
-  DIR* dir;
-  struct dirent* dp;
-  int sum = 0;
-  if ((dir=opendir("."))==NULL) { return -1; }
-  while ((dp=readdir(dir)) !=NULL) {
-    
-  }
-
-  printDirRec(dir,0);
-  sum = sumPrintDirFiles(dir, "." ,0);
+  int sum = printDir(".");
   
   //ty william and grace for making right unit
   char units[4][4] = {" B"," KB"," MB"," GB"};
@@ -61,6 +69,5 @@ int main() {
     i++;
   }
   printf("\nTotal size of regular files: %d %s\n", sum, units[i]);
-  closedir(dir);
   return 0;
 }
