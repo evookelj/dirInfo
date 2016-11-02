@@ -12,14 +12,16 @@ int main() {
   if ((dir=opendir("."))==NULL) {
     return -1;
   }
-  
+
+  printf("DIRECTORIES: \n");
   while ((dp=readdir(dir))!=NULL) {
-    if (dp->d_type == DT_DIR) { printf("DIRECTORY: %s\n",dp->d_name); }
+    if (dp->d_type == DT_DIR) { printf("\t%s\n",dp->d_name); }
   }
   dir=opendir(".");
+  printf("REGUALAR FILES: \n");
   while ((dp=readdir(dir))!=NULL) {
     if (dp->d_type == DT_REG) {
-      printf("%s\n", dp->d_name);
+      printf("\t%s\n", dp->d_name);
       struct stat buff;
       stat(dp->d_name, &buff);
       sum += buff.st_size;
@@ -29,12 +31,11 @@ int main() {
   //ty william and grace
   char units[4][4] = {" B"," KB"," MB"," GB"};
   int i=0;
-  printf("Size: %d bytes\n", sum);
   while (sum/1024 > 1) {
     sum = sum/1024;
     i++;
   }
-  printf("\nFile size sum: %d %s\n", sum, units[i]);
+  printf("\nTotal size of regular files: %d %s\n", sum, units[i]);
   closedir(dir);
   return 0;
 }
