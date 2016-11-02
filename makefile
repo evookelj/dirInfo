@@ -1,2 +1,5 @@
-comp: testdir.c
-	gcc testdir.c
+comp: dirInfo.c
+	gcc dirInfo.c
+
+run: a.out
+	./a.out
