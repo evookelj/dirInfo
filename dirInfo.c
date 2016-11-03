@@ -39,27 +39,29 @@ int printDirRec(char* path, int sub) {
     if (dp->d_type == DT_DIR) {
       for (i=0; i<sub; i++) { printf("\t"); }
       printf("\t%s\n", dp->d_name);
-      sum += sumPrintDirFiles(dp->d_name, sub+1);
+      if ((dp->d_name)[0] != '.') {
+	sum += printDir(dp->d_name, sub+1);
+      }
     }
   }
   closedir(dir);
   return sum;
 }
 
-int printDir(char* path) {
+int printDir(char* path, int sub) {
   DIR* dir;
   int sum = 0;
   if ((dir=opendir("."))==NULL) { return -1; }
   else {
-    sum += printDirRec(path, 0);
-    sum += sumPrintDirFiles(path, 0);
+    sum += printDirRec(path, sub);
+    sum += sumPrintDirFiles(path, sub);
   }
   closedir(dir);
   return sum;
 }
 
 int main() {
-  int sum = printDir(".");
+  int sum = printDir(".",0);
   
   //ty william and grace for making right unit
   char units[4][4] = {" B"," KB"," MB"," GB"};
